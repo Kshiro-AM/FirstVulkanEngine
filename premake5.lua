@@ -10,6 +10,9 @@ workspace "FirstVulkanEngine"
 
 outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
+IncludeDir = {}
+IncludeDir["SDL"] = "Engine/vender/SDL/include"
+
 project "Engine"
     location "Engine"
     kind "SHaredLib"
@@ -25,6 +28,21 @@ project "Engine"
         "%{prj.name}/src/**.h"
     }
 
+    includedirs 
+    { 
+        "%{IncludeDir.SDL}"
+    }
+
+    libdirs
+    {
+        "Engine/vender/SDL/lib"
+    }
+    
+    links
+    {
+        "SDL3"
+    }
+
     filter "system:windows"
         cppdialect "C++17"
         staticruntime "On"
@@ -32,7 +50,10 @@ project "Engine"
 
         postbuildcommands
         {
-            ("{COPY} %{cfg.buildtarget.relpath} ../bin/" .. outputdir .. "/SandBox")
+            -- copy targetdll to sandbox
+            ("{COPY} %{cfg.buildtarget.relpath} ../bin/" .. outputdir .. "/SandBox"),
+            -- copy SDL3.dll to sandbox
+            ("{COPY} vender/SDL/lib/SDL3.dll ../bin/" .. outputdir .. "/SandBox")
         }
 
     filter "configurations:Debug"
